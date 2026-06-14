@@ -1,0 +1,6 @@
+{
+  "name": "Aahar Byte",
+  "description": "A pristine and fully functional Point of Sale (POS) workspace, orders manager, inventory tracker, menu catalog, and table layout manager.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

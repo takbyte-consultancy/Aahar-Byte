@@ -1,0 +1,184 @@
+{
+  "entities": {
+    "MenuItem": {
+      "title": "MenuItem",
+      "description": "A representation of a restaurant menu item",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "The unique ID of the menu item" },
+        "name": { "type": "string", "description": "The name of the item" },
+        "category": { "type": "string", "description": "The food/drink category of the item" },
+        "price": { "type": "number", "description": "The unit price of the item" },
+        "stock": { "type": "integer", "description": "The currently available stock count" },
+        "image": { "type": "string", "description": "The URL image link of the item" },
+        "description": { "type": "string", "description": "A brief textual description of the dish" },
+        "tags": { "type": "array", "description": "Visual highlights/tags" },
+        "isAvailable": { "type": "boolean", "description": "Whether the item is currently on the menu" },
+        "discountPercentage": { "type": "integer", "description": "Marketing discount percentage if any" }
+      },
+      "required": ["id", "name", "category", "price", "stock", "image", "description", "tags", "isAvailable"]
+    },
+    "TableInfo": {
+      "title": "TableInfo",
+      "description": "Seating table in the restaurant",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique table number code" },
+        "capacity": { "type": "integer", "description": "Maximum guest capacity" },
+        "zone": { "type": "string", "description": "Restaurant physical architectural zone" },
+        "status": { "type": "string", "description": "Occupancy status" },
+        "floor": { "type": "string", "description": "Restaurant floor layout" }
+      },
+      "required": ["id", "capacity", "zone", "status"]
+    },
+    "RawMaterial": {
+      "title": "RawMaterial",
+      "description": "Central kitchen raw food inventory tracking item",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique inventory material code" },
+        "name": { "type": "string", "description": "Name of material" },
+        "unit": { "type": "string", "description": "Measurement unit" },
+        "currentStock": { "type": "number", "description": "Active stock level remaining" },
+        "status": { "type": "string", "description": "Stock severity level indicator" },
+        "icon": { "type": "string", "description": "Material visual design symbol" },
+        "category": { "type": "string", "description": "Optional category of the material" },
+        "label": { "type": "string", "description": "Optional classification/label badge of the material" }
+      },
+      "required": ["id", "name", "unit", "currentStock", "status", "icon"]
+    },
+    "InventoryLog": {
+      "title": "InventoryLog",
+      "description": "Historical logs recording kitchen stock additions, usages and restocks",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique log entry ID" },
+        "materialId": { "type": "string", "description": "Reference material ID key" },
+        "materialName": { "type": "string", "description": "Reference material display name" },
+        "actionType": { "type": "string", "description": "Type of balance alteration (e.g., CREATE, RESTOCK, ADJUST, USE, DELETE)" },
+        "amount": { "type": "number", "description": "Stock delta difference quantity" },
+        "unit": { "type": "string", "description": "Material physical units of supply" },
+        "previousStock": { "type": "number", "description": "Material stocks count before event update" },
+        "newStock": { "type": "number", "description": "Material stocks count following event update" },
+        "operator": { "type": "string", "description": "User profile or actor completing adjustment" },
+        "timestamp": { "type": "string", "description": "Event completion ISO date time string" },
+        "notes": { "type": "string", "description": "Additional operator metadata context" }
+      },
+      "required": ["id", "materialId", "materialName", "actionType", "amount", "unit", "previousStock", "newStock", "operator", "timestamp"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Terminal POS ticket for customer dining/takeaway bill",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Absolute order ID" },
+        "tableRef": { "type": "string", "description": "Serving table or pager reference ID" },
+        "timestamp": { "type": "string", "format": "date-time", "description": "Order placement date timestamp" },
+        "status": { "type": "string", "description": "Active queue state code" },
+        "items": { "type": "array", "description": "Food menu items in active card" },
+        "subtotal": { "type": "number", "description": "Bill subtotal before tax and discounts" },
+        "discountRate": { "type": "number", "description": "Discount rate fraction (e.g., 0.1 for 10%)" },
+        "taxRate": { "type": "number", "description": "Tax rate fraction (e.g., 0.1 for 10%)" },
+        "total": { "type": "number", "description": "Final customer bill to settle" },
+        "waitstaff": { "type": "string", "description": "Assigned server operator" },
+        "dineIn": { "type": "boolean", "description": "Dine-In option flag" },
+        "billId": { "type": "string", "description": "Unique sequentially logged Invoice code" },
+        "tokenNo": { "type": "integer", "description": "Daily queue token badge number" },
+        "time": { "type": "string", "description": "Locally represented text timestamp hour" },
+        "customerName": { "type": "string", "description": "Guest name" },
+        "customerPhone": { "type": "string", "description": "Guest telephone contact" },
+        "customerEmail": { "type": "string", "description": "Guest dispatch email" }
+      },
+      "required": ["id", "tableRef", "timestamp", "status", "items", "subtotal", "discountRate", "taxRate", "total", "dineIn"]
+    },
+    "PromoDiscount": {
+      "title": "PromoDiscount",
+      "description": "Marketing promotion coupon criteria record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Internal campaign ID" },
+        "code": { "type": "string", "description": "Redeemable coupon string code" },
+        "type": { "type": "string", "description": "Formula formula kind" },
+        "value": { "type": "number", "description": "Deduction quantity numeric amount" },
+        "isActive": { "type": "boolean", "description": "Criteria activation status" },
+        "minSpend": { "type": "number", "description": "Minimum qualify budget cap" }
+      },
+      "required": ["id", "code", "type", "value", "isActive"]
+    },
+    "UserSession": {
+      "title": "UserSession",
+      "description": "Restaurant operating staff credentials",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Internal database record ID" },
+        "name": { "type": "string", "description": "Staff member full name" },
+        "role": { "type": "string", "description": "Privilege group definition" },
+        "avatar": { "type": "string", "description": "Visual display symbol" },
+        "pin": { "type": "string", "description": "POS lock access pin passcode" },
+        "username": { "type": "string", "description": "Operating account username ID" },
+        "email": { "type": "string", "description": "Operating staff contact electronic mail" },
+        "status": { "type": "string", "description": "Admin validation state" }
+      },
+      "required": ["id", "name", "role", "avatar", "pin", "username"]
+    },
+    "MenuCategory": {
+      "title": "MenuCategory",
+      "description": "A food category",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the category" }
+      },
+      "required": ["name"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Registered and walked-in restaurant guests details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique key (phone or email)" },
+        "name": { "type": "string", "description": "Full name of guest" },
+        "phone": { "type": "string", "description": "Guest phone number" },
+        "email": { "type": "string", "description": "Guest email contact" }
+      },
+      "required": ["id", "name"]
+    }
+  },
+  "firestore": {
+    "customers": {
+      "schema": "Customer",
+      "description": "Walked-in restaurant guests and loyalty contacts"
+    },
+    "menuItems": {
+      "schema": "MenuItem",
+      "description": "Active dishes, starters, mains, drinks catalog collection"
+    },
+    "tables": {
+      "schema": "TableInfo",
+      "description": "Dining tables capacity and occupancy status"
+    },
+    "materials": {
+      "schema": "RawMaterial",
+      "description": "Kitchen stock and supply ingredients records"
+    },
+    "orders": {
+      "schema": "Order",
+      "description": "Terminal checkouts, tickets, and dining invoices"
+    },
+    "promoDiscounts": {
+      "schema": "PromoDiscount",
+      "description": "Active discount coupon campaign documents"
+    },
+    "users": {
+      "schema": "UserSession",
+      "description": "Operator login sessions and pin lock documents"
+    },
+    "categories": {
+      "schema": "MenuCategory",
+      "description": "Food menu categories list"
+    },
+    "inventoryLogs": {
+      "schema": "InventoryLog",
+      "description": "Sourced raw materials alterations, consumption checkouts, and log adjustments index"
+    }
+  }
+}

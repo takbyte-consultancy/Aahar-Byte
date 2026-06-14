@@ -1,0 +1,214 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions for validating security logic
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // Validate a MenuItem document
+    function isValidMenuItem(data) {
+      return data.keys().hasAll(['id', 'name', 'category', 'price', 'stock', 'image', 'description', 'tags', 'isAvailable'])
+        && data.id is string
+        && data.name is string && data.name.size() <= 200
+        && data.category is string
+        && data.price is number && data.price >= 0
+        && data.stock is int && data.stock >= 0
+        && data.image is string
+        && data.description is string
+        && data.tags is list
+        && data.isAvailable is bool
+        && data.get('discountPercentage', 0) is int;
+    }
+
+    // Validate TableInfo document
+    function isValidTableInfo(data) {
+      return data.keys().hasAll(['id', 'capacity', 'zone', 'status'])
+        && data.id is string
+        && data.capacity is int && data.capacity > 0
+        && data.zone is string
+        && data.status is string
+        && data.get('floor', '') is string;
+    }
+
+    // Validate RawMaterial document
+    function isValidRawMaterial(data) {
+      return data.keys().hasAll(['id', 'name', 'unit', 'currentStock', 'status', 'icon'])
+        && data.id is string
+        && data.name is string
+        && data.unit is string
+        && data.currentStock is number && data.currentStock >= 0
+        && data.status is string
+        && data.icon is string
+        && data.get('category', '') is string
+        && data.get('label', '') is string;
+    }
+
+    // Validate InventoryLog document
+    function isValidInventoryLog(data) {
+      return data.keys().hasAll(['id', 'materialId', 'materialName', 'actionType', 'amount', 'unit', 'previousStock', 'newStock', 'operator', 'timestamp'])
+        && data.id is string
+        && data.materialId is string
+        && data.materialName is string
+        && data.actionType is string
+        && data.amount is number
+        && data.unit is string
+        && data.previousStock is number
+        && data.newStock is number
+        && data.operator is string
+        && data.timestamp is string
+        && data.get('notes', '') is string;
+    }
+
+    // Validate Order document
+    function isValidOrder(data) {
+      return data.keys().hasAll(['id', 'tableRef', 'timestamp', 'status', 'items', 'subtotal', 'discountRate', 'taxRate', 'total', 'dineIn'])
+        && data.id is string
+        && data.tableRef is string
+        && data.timestamp is string
+        && data.status is string
+        && data.items is list
+        && data.subtotal is number
+        && data.discountRate is number
+        && data.taxRate is number
+        && data.total is number
+        && data.dineIn is bool
+        && data.get('waitstaff', '') is string
+        && data.get('billId', '') is string
+        && data.get('tokenNo', 0) is int
+        && data.get('time', '') is string
+        && data.get('customerName', '') is string
+        && data.get('customerPhone', '') is string
+        && data.get('customerEmail', '') is string;
+    }
+
+    // Validate PromoDiscount document
+    function isValidPromoDiscount(data) {
+      return data.keys().hasAll(['id', 'code', 'type', 'value', 'isActive'])
+        && data.id is string
+        && data.code is string
+        && data.type is string
+        && data.value is number && data.value >= 0
+        && data.isActive is bool
+        && data.get('minSpend', 0) is number;
+    }
+
+    // Validate UserSession document
+    function isValidUserSession(data) {
+      return data.keys().hasAll(['id', 'name', 'role', 'avatar', 'pin', 'username'])
+        && data.id is string
+        && data.name is string
+        && data.role is string
+        && data.avatar is string
+        && data.pin is string
+        && data.username is string
+        && data.get('email', '') is string
+        && data.get('status', '') is string;
+    }
+
+    // Validate MenuCategory document
+    function isValidMenuCategory(data) {
+      return data.keys().hasAll(['name'])
+        && data.name is string && data.name.size() <= 100;
+    }
+
+    // Validate Organisation document
+    function isValidOrganisation(data) {
+      return data.keys().hasAll(['id', 'code', 'name', 'ownerName', 'ownerEmail', 'createdAt'])
+        && data.id is string
+        && data.code is string
+        && data.name is string
+        && data.ownerName is string
+        && data.ownerEmail is string
+        && data.createdAt is string;
+    }
+
+    // Validate Customer document
+    function isValidCustomer(data) {
+      return data.keys().hasAll(['id', 'name'])
+        && data.id is string
+        && data.name is string
+        && data.get('phone', '') is string
+        && data.get('email', '') is string;
+    }
+
+    // Collection: menuItems
+    match /menuItems/{itemId} {
+      allow read: if true; // Publicly readable for terminal catalog
+      allow create, update: if isValidId(itemId) && isValidMenuItem(incoming());
+      allow delete: if true;
+    }
+
+    // Collection: tables
+    match /tables/{tableId} {
+      allow read: if true;
+      allow create, update: if isValidId(tableId) && isValidTableInfo(incoming());
+      allow delete: if true;
+    }
+
+    // Collection: materials
+    match /materials/{materialId} {
+      allow read: if true;
+      allow create, update: if isValidId(materialId) && isValidRawMaterial(incoming());
+      allow delete: if true;
+    }
+
+    // Collection: orders
+    match /orders/{orderId} {
+      allow read: if true;
+      allow create, update: if isValidId(orderId) && isValidOrder(incoming());
+      allow delete: if true;
+    }
+
+    // Collection: promoDiscounts
+    match /promoDiscounts/{promoId} {
+      allow read: if true;
+      allow create, update: if isValidId(promoId) && isValidPromoDiscount(incoming());
+      allow delete: if true;
+    }
+
+    // Collection: users
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if isValidId(userId) && isValidUserSession(incoming());
+      allow delete: if true;
+    }
+
+    // Collection: categories
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow create, update: if isValidId(categoryId) && isValidMenuCategory(incoming());
+      allow delete: if true;
+    }
+
+    // Collection: organisations
+    match /organisations/{orgId} {
+      allow read: if true;
+      allow create, update: if isValidId(orgId) && isValidOrganisation(incoming());
+      allow delete: if true;
+    }
+
+    // Collection: customers
+    match /customers/{customerId} {
+      allow read: if true;
+      allow create, update: if isValidId(customerId) && isValidCustomer(incoming());
+      allow delete: if true;
+    }
+
+    // Collection: inventoryLogs
+    match /inventoryLogs/{logId} {
+      allow read: if true;
+      allow create, update: if isValidId(logId) && isValidInventoryLog(incoming());
+      allow delete: if true;
+    }
+  }
+}
